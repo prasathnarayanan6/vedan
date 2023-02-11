@@ -1,3 +1,6 @@
+<?php
+include_once "conn.php"; 
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -7,6 +10,7 @@
     <title>Document</title>
     <link rel="stylesheet" href="./css/bootstrap.min.css">
     <link rel="stylesheet" href="./css/mm.css">
+    <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"> -->
     <script src="./js/bootstrap.bundle.min.js"></script>
     <style>
@@ -51,9 +55,9 @@
 <center><h4>Login</h4></center><br>
 <div style="display: flex; justify-content: center; align-items: center; height: 30vh;">
   <form action="" method="post">
-    <input type="email" class="no-outline" id="exampleFormControlInput1" placeholder="Email" size="30"><br><br>
-    <input type="password" class="no-outline" id="exampleFormControlInput1" placeholder="Password" size="30"><br><br><br>
-    <center><input type="submit" class="btn btn-dark"placeholder="Login"></center>
+    <input type="email" name="email" class="no-outline" id="exampleFormControlInput1" placeholder="Email" size="30"><br><br>
+    <input type="password" name="pass" class="no-outline" id="exampleFormControlInput1" placeholder="Password" size="30"><br><br><br>
+    <center><button type="submit" name="login" class="btn btn-dark">Login</button></center>
   </form>
 </div><br><br>
 <center>
@@ -61,3 +65,49 @@
 </center> 
 </body>
 </html>
+<?php
+if(isset($_POST['login'])){
+  $email = $_POST['email']; 
+  $password1 = 'email';
+  $method1 = 'aes-256-cbc';
+  $key1 = substr(hash('sha256', $password1, true), 0, 32);
+  $iv1 = chr(0x0) . chr(0x0) . chr(0x0) . chr(0x0) . chr(0x0) . chr(0x0) . chr(0x0) . chr(0x0) . chr(0x0) . chr(0x0) . chr(0x0) . chr(0x0) . chr(0x0) . chr(0x0) . chr(0x0) . chr(0x0);
+  $encrypted1 = base64_encode(openssl_encrypt($email, $method1, $key1, OPENSSL_RAW_DATA, $iv1));
+  $decrypted1 = openssl_decrypt(base64_decode($encrypted1), $method1, $key1, OPENSSL_RAW_DATA, $iv1);
+  // echo 'encrypted to: ' . $encrypted . "\n";
+
+  $plaintext = $_POST['pass']; 
+  $password = 'vedanta256';
+  $method = 'aes-256-cbc';
+  $key = substr(hash('sha256', $password, true), 0, 32);
+  $iv = chr(0x0) . chr(0x0) . chr(0x0) . chr(0x0) . chr(0x0) . chr(0x0) . chr(0x0) . chr(0x0) . chr(0x0) . chr(0x0) . chr(0x0) . chr(0x0) . chr(0x0) . chr(0x0) . chr(0x0) . chr(0x0);
+  $encrypted = base64_encode(openssl_encrypt($plaintext, $method, $key, OPENSSL_RAW_DATA, $iv));
+  $decrypted = openssl_decrypt(base64_decode($encrypted), $method, $key, OPENSSL_RAW_DATA, $iv);
+  // echo 'encrypted to: ' . $encrypted . "\n";
+  // echo 'decrypted to: ' . $decrypted . "\n\n";
+
+
+  $sanitized_userid = mysqli_real_escape_string($conn, $email);
+  $sanitized_password = mysqli_real_escape_string($conn, $encrypted);
+
+  $sql = "SELECT * FROM login WHERE email = '" . $sanitized_userid . "' AND pass = '" . $sanitized_password . "'";
+
+  $result = mysqli_query($conn, $sql) 
+    or die(mysqli_error($conn));
+      
+  $num = mysqli_fetch_array($result);
+      
+  if($num > 0) {
+    header("Location: sha256.php?identity={$encrypted1}");
+  }
+  else {
+    echo "<script>
+       Swal.fire({
+       icon: 'error',
+      title: 'Oops...😞',
+      text: 'Invalid Credentials',
+    })
+    </script>";
+    }
+  } 
+?>
