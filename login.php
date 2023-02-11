@@ -1,5 +1,6 @@
 <?php
 include_once "conn.php"; 
+session_start(); 
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -11,7 +12,6 @@ include_once "conn.php";
     <link rel="stylesheet" href="./css/bootstrap.min.css">
     <link rel="stylesheet" href="./css/mm.css">
     <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"> -->
     <script src="./js/bootstrap.bundle.min.js"></script>
     <style>
     input{
@@ -74,7 +74,7 @@ if(isset($_POST['login'])){
   $iv1 = chr(0x0) . chr(0x0) . chr(0x0) . chr(0x0) . chr(0x0) . chr(0x0) . chr(0x0) . chr(0x0) . chr(0x0) . chr(0x0) . chr(0x0) . chr(0x0) . chr(0x0) . chr(0x0) . chr(0x0) . chr(0x0);
   $encrypted1 = base64_encode(openssl_encrypt($email, $method1, $key1, OPENSSL_RAW_DATA, $iv1));
   $decrypted1 = openssl_decrypt(base64_decode($encrypted1), $method1, $key1, OPENSSL_RAW_DATA, $iv1);
-  // echo 'encrypted to: ' . $encrypted . "\n";
+  
 
   $plaintext = $_POST['pass']; 
   $password = 'vedanta256';
@@ -83,22 +83,29 @@ if(isset($_POST['login'])){
   $iv = chr(0x0) . chr(0x0) . chr(0x0) . chr(0x0) . chr(0x0) . chr(0x0) . chr(0x0) . chr(0x0) . chr(0x0) . chr(0x0) . chr(0x0) . chr(0x0) . chr(0x0) . chr(0x0) . chr(0x0) . chr(0x0);
   $encrypted = base64_encode(openssl_encrypt($plaintext, $method, $key, OPENSSL_RAW_DATA, $iv));
   $decrypted = openssl_decrypt(base64_decode($encrypted), $method, $key, OPENSSL_RAW_DATA, $iv);
-  // echo 'encrypted to: ' . $encrypted . "\n";
-  // echo 'decrypted to: ' . $decrypted . "\n\n";
+  
 
 
   $sanitized_userid = mysqli_real_escape_string($conn, $email);
   $sanitized_password = mysqli_real_escape_string($conn, $encrypted);
+  $MAC = exec('getmac');
+  
+  // Storing 'getmac' value in $MAC
+  $MAC = strtok($MAC, ' ');
 
   $sql = "SELECT * FROM login WHERE email = '" . $sanitized_userid . "' AND pass = '" . $sanitized_password . "'";
-
+  $date = date("Y-m-d_h:i:sa");
   $result = mysqli_query($conn, $sql) 
     or die(mysqli_error($conn));
       
   $num = mysqli_fetch_array($result);
       
   if($num > 0) {
-    header("Location: sha256.php?identity={$encrypted1}");
+    $_SESSION['email']=$sanitized_userid;
+    $_SESSION['pass']=$sanitized_password;
+    header("Location: dashboard.php?identity={$encrypted1}&&macaddress={$MAC}");
+    $ins = "INSERT INTO loginact(email, datetime, mac) VALUES('$email','$date', '$MAC')";
+    $conn->query($ins);
   }
   else {
     echo "<script>

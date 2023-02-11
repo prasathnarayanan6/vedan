@@ -32,3 +32,21 @@ $decrypted = openssl_decrypt(base64_decode($encrypted), $method, $key, OPENSSL_R
 // echo 'cipher=' . $method . "\n";
 echo 'encrypted to: ' . $encrypted . "\n";
 echo 'decrypted to: ' . $decrypted . "\n\n";
+
+$MAC = exec('getmac');
+  
+// Storing 'getmac' value in $MAC
+$MAC = strtok($MAC, ' ');
+  
+// Updating $MAC value using strtok function, 
+// strtok is used to split the string into tokens
+// split character of strtok is defined as a space
+// because getmac returns transport name after
+// MAC address   
+echo "MAC address of Server is: $MAC";
+
+system('ipconfig/all');
+$a = ob_get_contents();
+ob_clean();
+$mac = substr($a,(strpos($a,"physical")+36),17);
+echo $mac;
