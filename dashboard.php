@@ -104,6 +104,8 @@ overflow-y: auto; /* Scrollable contents if viewport is shorter than content. */
         </a>
       </div>
     </div>
+    <center><p class="mt-5">©️ All rights Reserved</p></center>
+    <center><img src="./img/Xyma_BG.svg" width="55%" class="mt-5"></img></center>
   </nav>
   <!-- Sidebar -->
 
