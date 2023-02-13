@@ -24,11 +24,11 @@ session_start();
      outline: none;
     }
     h4{
-            /* Increase this as per requirement */
-            padding-bottom: 10px;
-            border-bottom-style: solid;
-            border-bottom-width: 3.1px;
-            width: fit-content;
+      /* Increase this as per requirement */
+      padding-bottom: 10px;
+      border-bottom-style: solid;
+      border-bottom-width: 3.1px;
+      width: fit-content;
     }
     ul {
       list-style-type: none;
@@ -60,7 +60,7 @@ session_start();
     <center><button type="submit" name="login" class="btn btn-dark">Login</button></center>
   </form>
 </div><br><br>
-<center>
+<center> 
 <p><b>© 2021 XYMA Analytics Inc. IIT Madras Research Park, Chennai, 600113</b></p>
 </center> 
 </body>
